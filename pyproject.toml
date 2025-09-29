@@ -1,0 +1,42 @@
+[project]
+name = "mr-post"
+version = "0.1.0"
+description = "AI Solution that helps users to writing posts about any idea"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    # Web frameworks
+    "fastapi>=0.104.0",
+    "jinja2>=3.1.0",
+    "uvicorn>=0.24.0",
+    # Database
+    "sqlalchemy>=2.0.0",
+    # AI/ML
+    "openai>=1.0.0",
+    "anthropic>=0.7.0",
+    # Utilities
+    "pydantic[email]>=2.0.0",
+    "python-multipart>=0.0.6",
+    "python-jose[cryptography]>=3.3.0",
+    "passlib[bcrypt]>=1.7.4",
+    "httpx>=0.25.0",
+    "starlette>=0.27.0",
+    "python-fasthtml>=0.12.29",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mr_post"]
+
+[tool.uv]
+
+[dependency-groups]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+]
