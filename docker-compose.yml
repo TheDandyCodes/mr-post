@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  # Storage microservice
+  storage:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.storage
+    ports:
+      - "8001:8001"
+    environment:
+      - DATABASE_URL=sqlite:///./mr_post.db
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Agents microservice
+  agents:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.agents
+    ports:
+      - "8002:8002"
+    environment:
+      - STORAGE_SERVICE_URL=http://storage:8001
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-demo-key}
+    depends_on:
+      - storage
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend microservice
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    ports:
+      - "8000:8000"
+    environment:
+      - STORAGE_SERVICE_URL=http://storage:8001
+      - AGENTS_SERVICE_URL=http://agents:8002
+    depends_on:
+      - storage
+      - agents
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  data:
