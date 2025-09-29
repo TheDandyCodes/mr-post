@@ -25,7 +25,17 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Mr. Post Storage Service", version="1.0.0", lifespan=lifespan)
 
-# Pydantic models
+# Security
+security = HTTPBearer()
+import hashlib
+
+def get_password_hash(password):
+    """Simple password hashing for demo purposes"""
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def verify_password(plain_password, hashed_password):
+    """Simple password verification for demo purposes"""
+    return hashlib.sha256(plain_password.encode()).hexdigest() == hashed_password
 class UserCreate(BaseModel):
     email: EmailStr
     username: str
@@ -94,12 +104,7 @@ class PostResponse(BaseModel):
     class Config:
         from_attributes = True
 
-# Helper functions
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
-
-def get_password_hash(password):
-    return pwd_context.hash(password)
+# Pydantic models
 
 def create_session_token():
     return secrets.token_urlsafe(32)
@@ -125,9 +130,6 @@ def get_user_from_token(credentials: HTTPAuthorizationCredentials = Depends(secu
         )
     
     return user
-
-# Security
-security = HTTPBearer()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Auth endpoints

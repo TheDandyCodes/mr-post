@@ -26,12 +26,10 @@ def run_service(service_name, module_path, port):
         env["STORAGE_SERVICE_URL"] = "http://localhost:8001"
         env["AGENTS_SERVICE_URL"] = "http://localhost:8002"
     
+    # Use uv run to ensure we're in the virtual environment
     return subprocess.Popen([
-        sys.executable, "-c", 
-        f"import sys; sys.path.insert(0, '{PROJECT_ROOT}'); "
-        f"from {module_path} import app; "
-        f"import uvicorn; uvicorn.run(app, host='0.0.0.0', port={port})"
-    ], env=env)
+        os.path.expanduser("~/.local/bin/uv"), "run", "python", "-m", module_path
+    ], env=env, cwd=PROJECT_ROOT)
 
 def main():
     """Run all services for development"""
